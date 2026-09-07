@@ -1,6 +1,6 @@
 import http from 'node:http';import fs from 'node:fs';import path from 'node:path';import crypto from 'node:crypto';import {fileURLToPath} from 'node:url';import {Store} from './lib/store.js';import {Auth} from './lib/auth.js';import {Acquirer} from './lib/acquire.js';import {ResourceGuard} from './lib/resource-guard.js';import {ActionHandler,ALLOWED_ACTIONS} from './lib/actions.js';import {CSP,LIMITS,exactHost,exactOrigin,jsonContentType,parseCookies,safeEqual,sanitize,sseOverLimit} from './lib/core.js';
 const ROOT=path.dirname(fileURLToPath(import.meta.url)),PORT=Number(process.env.PORT||3210),HOST=process.env.HOST||'127.0.0.1';
-if(HOST!=='127.0.0.1'&&HOST!=='0.0.0.0'){console.error('REFUSED: HOST must be 127.0.0.1 or 0.0.0.0');process.exit(78)}
+if(!['127.0.0.1','0.0.0.0','::'].includes(HOST)&&!HOST.match(/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/)){console.error('REFUSED: invalid HOST');process.exit(78)}
 if(!Number.isInteger(PORT)||PORT<1024||PORT>65535){console.error('REFUSED: invalid PORT');process.exit(78)}
 const store=new Store(process.env.COCKPIT_DATA_DIR||path.join(ROOT,'data')),auth=new Auth(store),clients=new Set(),attempts=new Map();let current=store.state.lastSnapshot||null;
 const actionHandler=new ActionHandler(store);
