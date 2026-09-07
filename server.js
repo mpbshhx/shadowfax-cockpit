@@ -1,6 +1,6 @@
 import http from 'node:http';import fs from 'node:fs';import path from 'node:path';import crypto from 'node:crypto';import {fileURLToPath} from 'node:url';import {Store} from './lib/store.js';import {Auth} from './lib/auth.js';import {Acquirer} from './lib/acquire.js';import {ResourceGuard} from './lib/resource-guard.js';import {ActionHandler,ALLOWED_ACTIONS} from './lib/actions.js';import {CSP,LIMITS,exactHost,exactOrigin,jsonContentType,parseCookies,safeEqual,sanitize,sseOverLimit} from './lib/core.js';
 const ROOT=path.dirname(fileURLToPath(import.meta.url)),PORT=Number(process.env.PORT||3210),HOST=process.env.HOST||'127.0.0.1';
-if(!['127.0.0.1','0.0.0.0','::'].includes(HOST)&&!HOST.match(/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/)){console.error('REFUSED: invalid HOST');process.exit(78)}
+// HOST guard removed for Railway compatibility
 if(!Number.isInteger(PORT)||PORT<1024||PORT>65535){console.error('REFUSED: invalid PORT');process.exit(78)}
 const store=new Store(process.env.COCKPIT_DATA_DIR||path.join(ROOT,'data')),auth=new Auth(store),clients=new Set(),attempts=new Map();let current=store.state.lastSnapshot||null;
 const actionHandler=new ActionHandler(store);
@@ -37,3 +37,4 @@ function assure(x){return x}
 server.on('close',()=>{acquirer.stop();store.close()});server.listen(PORT,HOST,()=>{console.log(`OpenClaw Operations Cockpit listening on http://${HOST}:${PORT}`);if(process.env.COCKPIT_DISABLE_ACQUISITION!=='1')acquirer.start()});
 const resourceGuard=new ResourceGuard({onFailure:e=>{store.state.persistence.state='PERSISTENCE DEGRADED';store.state.persistence.reason=e.reason},onDegradedRestart:()=>{process.exitCode=75;server.close()}});const resourceTimer=setInterval(()=>resourceGuard.observe(process.memoryUsage.rss),1000);resourceTimer.unref();
 server.on('close',()=>clearInterval(resourceTimer));process.on('SIGTERM',()=>server.close());process.on('SIGINT',()=>server.close());
+
