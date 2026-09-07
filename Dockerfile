@@ -23,6 +23,7 @@ ENV PORT=3210
 ENV COCKPIT_DATA_DIR=/data
 ENV COCKPIT_DISABLE_ACQUISITION=0
 
+# Railway injects PORT at runtime — EXPOSE is a hint only
 EXPOSE 3210
 
 CMD ["node", "server.js"]
