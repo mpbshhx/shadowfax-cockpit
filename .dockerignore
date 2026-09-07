@@ -1,0 +1,11 @@
+node_modules
+data
+.env
+*.log
+test
+collector
+scripts/u01-cold-operator-scenario.js
+scripts/fixture-replay.js
+scripts/sse-slow-reader.js
+scripts/r04-isolated-child.js
+scripts/process-secret-scan.js

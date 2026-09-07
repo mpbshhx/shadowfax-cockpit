@@ -1,0 +1,16 @@
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "node server.js"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+
+[[deploy.healthchecks]]
+type = "http"
+path = "/healthz"
+initialDelaySeconds = 5
+periodSeconds = 30
+timeoutSeconds = 10
+failureThreshold = 3
